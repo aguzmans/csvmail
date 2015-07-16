@@ -1,0 +1,6 @@
+
+{
+  "require": {
+    "tedivm/fetch": "0.6.*"
+  }
+}
