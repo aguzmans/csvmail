@@ -14,14 +14,14 @@ $savedirpath = "download";
 
 
 //MySQL configuration
-$dbHost = "198.57.196.229";
-$dbUsername = "lcca_abel";
-$dbPass = "Abel063015";
-$dbName = "lcca_dataimport";
-//$dbHost = "localhost";
-//$dbUsername = "root";
-//$dbPass = "root";
-//$dbName = "lcca_dataimport01";
+//$dbHost = "198.57.196.229";
+//$dbUsername = "lcca_abel";
+//$dbPass = "Abel063015";
+//$dbName = "lcca_dataimport";
+$dbHost = "localhost";
+$dbUsername = "root";
+$dbPass = "root";
+$dbName = "lcca_dataimport01";
 
 
 //Files and MySQL relationship

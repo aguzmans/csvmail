@@ -25,13 +25,16 @@ foreach ($attachmentPathNames as $key =>$attachmentPathName){
             $dateAndGroup = $files->getDateAndGroup($attachmentPathName[0], $key1, $lineStart);
         }
     }
-    if ($dateAndGroup[0] != ""){
-        $attachmentPathNames[$key][3] =$dateAndGroup[0];
-    }
-    if ($dateAndGroup[1] != ""){
-        $attachmentPathNames[$key][4] =$dateAndGroup[1];
+    if(isset($dateAndGroup[1])){
+        if ($dateAndGroup[0] != ""){
+            $attachmentPathNames[$key][3] =$dateAndGroup[0];
+        }
+        if ($dateAndGroup[1] != ""){
+            $attachmentPathNames[$key][4] =$dateAndGroup[1];
+        }
     }
 }
+
 
 /* 2.1- Check that those files have not been received already*/
 /* 2.2- Save data to MySQL */

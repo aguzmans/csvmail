@@ -27,18 +27,12 @@ class CsvFileInsert extends Utils {
             $count++;
         }
         $this->filePaths = $afilePaths;
-//        foreach ($this->filePaths as $key => $filePath){
-//            $this->getDataToInsert($ColumnLine, $dbh, $filePath);
-//        }
-//        var_dump($this->filePaths);
     }
     private function getDataToInsert($ColumnLine, $dbh, $filePath){
         if (($handle = fopen($filePath[0], "r")) !== FALSE) {
             $count=1;
             while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
-                //echo 'In the loop'.PHP_EOL;
                 if($count > $ColumnLine[1]){
-                    //var_dump($filePath[6]);
                     $this->insertToMySQL($data, $dbh, $ColumnLine[3], $filePath[6]);
                 }
                 $count++;
@@ -49,13 +43,9 @@ class CsvFileInsert extends Utils {
  *  Insert to MySQL table
  */
     private function insertToMySQL($data, $dbh, $OrderedColumns, $tableMySQL){
-        $data = $this->filterData($data,$dbh,$OrderedColumns, $tableMySQL); 
-//        var_dump($data);
-//        die;
+        $data = $this->filterData($data,$dbh,$OrderedColumns, $tableMySQL);
         if (count($data) > 5){
-//            var_dump($data);
             $fielsNamesMySQL = implode("`, `", $OrderedColumns);
-            //echo $fielsNamesMySQL.PHP_EOL;
             $sql = "INSERT INTO `$tableMySQL` (id,`".$fielsNamesMySQL."`) VALUES (NULL,";
             foreach($data as $f=>$v){
                   $values[]=$v;                  
