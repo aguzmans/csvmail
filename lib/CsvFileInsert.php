@@ -3,12 +3,138 @@
  * Description of CsvFileInsert
  * @author abel
  */
-class CsvFileInsert {
+class CsvFileInsert extends Utils {
+    /**
+     * Clasify files to be inserted
+     */
+    protected $filePaths;
+    public function __construct($afilePath = NULL){
+        if ($afilePath != NULL){
+            $this->filePaths = $afilePath;
+        }            
+    }
+    public function classifyFile($doInsets, $afilePaths, $CSVOrderedColumns,
+            $subjectFilters, $lineStart, $dbh, $MySQLTables, $MySQLOrderedColumns){
+        $count = 1;
+        foreach ($doInsets as $key => $status){
+            if ($status == "ToDo"){
+                $ColumnLine = $this->determineColumnAndLine($afilePaths, 
+                        $CSVOrderedColumns, $subjectFilters, $key, $lineStart,$MySQLTables, $MySQLOrderedColumns);
+                $afilePaths = $this->selectEqualColumns($ColumnLine, $afilePaths, $key); 
+                $afilePaths[$key][6]=$ColumnLine[2];
+                $this->getDataToInsert($ColumnLine, $dbh, $afilePaths[$key]);
+            }
+            $count++;
+        }
+        $this->filePaths = $afilePaths;
+//        foreach ($this->filePaths as $key => $filePath){
+//            $this->getDataToInsert($ColumnLine, $dbh, $filePath);
+//        }
+//        var_dump($this->filePaths);
+    }
+    private function getDataToInsert($ColumnLine, $dbh, $filePath){
+        if (($handle = fopen($filePath[0], "r")) !== FALSE) {
+            $count=1;
+            while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
+                //echo 'In the loop'.PHP_EOL;
+                if($count > $ColumnLine[1]){
+                    //var_dump($filePath[6]);
+                    $this->insertToMySQL($data, $dbh, $ColumnLine[3], $filePath[6]);
+                }
+                $count++;
+            }            
+        }        
+    }
+/**
+ *  Insert to MySQL table
+ */
+    private function insertToMySQL($data, $dbh, $OrderedColumns, $tableMySQL){
+        $data = $this->filterData($data,$dbh,$OrderedColumns, $tableMySQL); 
+//        var_dump($data);
+//        die;
+        if (count($data) > 5){
+//            var_dump($data);
+            $fielsNamesMySQL = implode("`, `", $OrderedColumns);
+            //echo $fielsNamesMySQL.PHP_EOL;
+            $sql = "INSERT INTO `$tableMySQL` (id,`".$fielsNamesMySQL."`) VALUES (NULL,";
+            foreach($data as $f=>$v){
+                  $values[]=$v;                  
+            } 
+            try{
+                $qs=str_repeat("?,",count($values)-1);
+                $sql.="${qs}?);";
+                echo PHP_EOL.$sql.PHP_EOL;
+                $q=$dbh->prepare($sql);
+                $q->execute($values);            
+            } catch (PDOException $e){
+                echo 'Error: '.$e->getMessage();
+            }
+        } 
+    }  
+    public function filterData($data,$dbh,$MySQLOrderedColumns, $tableMySQL ){
+        $types = $this->columnTypes($dbh, $MySQLOrderedColumns, $tableMySQL);
+        array_shift($types);
+        array_pop($data);
+//        var_dump($data);
+        if (count($types) == count($data)){
+            foreach ($types as $key => $value){
+                echo 'Field type: '.$value." Data: ".$data[$key].PHP_EOL;
+                if($value == "LONG" || $value == "TINY" ||  $value == "DOUBLE" ||  $value == "SHORT"){
+                    //echo 'Number: '.$data[$key].PHP_EOL;
+                    $data[$key] = $this->stringToNumber($data[$key]);
+                }
+                if($value == "DATETIME"){
+                    //echo 'DateTime: '.$data[$key].PHP_EOL;
+                    $data[$key] = $this->stringToDatetime($data[$key]);
+                }
+            }
+        }
+        return $data;
+    }    
+    /**
+     * Mark file headers as equal to the config array or not
+     */
+    private function selectEqualColumns($ColumnLine,$afilePaths, $key){
+        if (($handle = fopen($afilePaths[$key][0], "r")) !== FALSE) {
+            $count=1;
+            while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
+                if ( $count == $ColumnLine[1]) {
+                    array_pop($data);
+                    if ($data === $ColumnLine[0]) {
+                        $afilePaths[$key][5] = "Equals";
+                        break;
+                    }  else {
+                        $afilePaths[$key][5] = "Different";
+                        break;                        
+                    }
+                }
+                $count++;
+            }
+        }
+        return $afilePaths;
+    }    
+    /**
+     * Determine columns for this file as well as start line, 
+     */
+    private function determineColumnAndLine($filePaths, $CSVOrderedColumns, 
+            $subjectFilters, $key, $lineStart,$MySQLTables, $MySQLOrderedColumns){
+        $ColumnLine = array();
+        $aux = array_search($filePaths[$key][1], $subjectFilters);
+        $realColumnsCSV = $CSVOrderedColumns[$aux];
+        $aux1 = array_search($filePaths[$key][1], $subjectFilters);
+        $thisLine = $lineStart[$aux1][2];
+
+        $ColumnLine[0] = $realColumnsCSV;
+        $ColumnLine[1] = $thisLine;
+        $ColumnLine[2] = $MySQLTables[$aux];
+        $ColumnLine[3] = $MySQLOrderedColumns[$aux];
+        return $ColumnLine;
+    }
     public function testCsvFile($doInsets,$filePaths, $CSVOrderedColumns, 
             $subjectFilters, $lineStart, $dbh, $MySQLOrderedColumns, $MySQLTables){        
         foreach ($doInsets as $key => $status){
             if ($status == "ToDo"){
-                if (($handle = fopen($filePaths[$key][0].".bak.1", "r")) !== FALSE) {
+                if (($handle = fopen($filePaths[$key][0], "r")) !== FALSE) {
                     $count=1;
                     $CommandInsert = FALSE;
                     $poss = array();
@@ -24,8 +150,8 @@ class CsvFileInsert {
                                             $subjectFilters)];
 //                        echo $filePaths[$key][1].PHP_EOL;
                         $thisLine = $lineStart[array_search($filePaths[$key][1], 
-                                            $subjectFilters)];
-//                        echo $thisLine."-".$count.PHP_EOL;
+                                            $subjectFilters)][2];
+                        echo $thisLine."-".$count.PHP_EOL;
                         if ($count == $thisLine) {          
                             //var_dump($data,$realColumnsCSV);
                             if ($data === $realColumnsCSV) {
@@ -67,38 +193,8 @@ class CsvFileInsert {
 
         }
     }
-    public function insertToMySQL($data, $count, $dbh, $OrderedColumns, $tableMySQL){
-        $data = $this->filterData($data,$dbh,$OrderedColumns, $tableMySQL); 
-        if (count($data) > 5){
-            $fielsNamesMySQL = implode("`, `", $OrderedColumns);
-            $sql = "INSERT INTO tblSupplyData (id,`".$fielsNamesMySQL."`) VALUES (NULL,";
-            foreach($data as $f=>$v){
-                  $values[]=$v;                  
-            } 
-            try{
-                $qs=str_repeat("?,",count($values)-1);
-                $sql.="${qs}?);";
-                $q=$dbh->prepare($sql);
-                $q->execute($values);            
-            } catch (PDOException $e){
-                echo 'Error: '.$e->getMessage();
-            }
-        } else {
-//            var_dump($data);
-        }
-    }
-    public function filterData($data,$dbh,$MySQLOrderedColumns, $tableMySQL ){
-        $types = $this->columnTypes($dbh, $MySQLOrderedColumns, $tableMySQL);
-        array_shift($types);
-        foreach ($data as $key => $value){
-            if($types[$key] == "LONG" || $types[$key] == "TINY" || $types[$key] == "DOUBLE" || $types[$key] == "SHORT")
-                    $data[$key] = $this->stringToNumber($data[$key]);
-            if($types[$key] == "DATETIME"){
-                    $data[$key] = $this->stringToDatetime($data[$key]);
-            }
-        }
-        return $data;
-    }
+
+
     public function columnTypes($dbh,$MySQLOrderedColumns, $tableMySQL){
         $count = count($MySQLOrderedColumns);
         $aux = array();

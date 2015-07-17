@@ -5,8 +5,6 @@
  * @author abel
  */
 class Utils {
-    
-
     //Connecto to DB.
     public function dbConnection ($dbHost, $dbName, $dbUsername, $dbPass){
         try{
@@ -51,7 +49,6 @@ class Utils {
                 return 'Error: '.$e->getMessage();
             }
         }
-        var_dump($doInser);
         return $doInser;
     }
     //Inser file data 
