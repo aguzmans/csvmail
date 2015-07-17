@@ -50,5 +50,8 @@ require_once './lib/CsvFileInsert.php';
 $CsvWorks = new CsvFileInsert();
 $CsvWorks->classifyFile($doInsets, $attachmentPathNames, $CSVOrderedColumns,
             $subjectFilters, $lineStart, $dbh ,$MySQLTables, $MySQLOrderedColumns);
-//$CsvWorks->testCsvFile($doInsets, $attachmentPathNames, $CSVOrderedColumns, $subjectFilters, $lineStart, $dbh, $MySQLOrderedColumns, $MySQLTables);
 
+
+require_once './lib/FileCleaner.php';
+$files = new FileCleaner();
+$files->deleteDownloadedFiles($savedirpath);
