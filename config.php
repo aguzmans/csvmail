@@ -1,6 +1,5 @@
 <?php
 // E-mail configuration
-
 // Define E-mail server data.
 $mailServerChain = '{stu.stuff4less.ca:993/novalidate-cert/ssl}INBOX';
 $mailServerShort = 'stu.stuff4less.ca/novalidate-cert';
@@ -14,7 +13,10 @@ $savedirpath = "download";
 
 
 //MySQL configuration
-
+//$dbHost = "198.57.196.229";
+//$dbUsername = "lcca_abel";
+//$dbPass = "Abel063015";
+//$dbName = "lcca_dataimport";
 $dbHost = "localhost";
 $dbUsername = "root";
 $dbPass = "root";
@@ -61,5 +63,3 @@ $CSVOrderedColumns = [
         "Duplex Impressions","Outgoing Analog Fax Count","Inventory Status",
         "Inventory Date"]
     ];
-
-//require_once 'lib/firldsList.php';

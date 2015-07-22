@@ -22,11 +22,45 @@ class CsvFileInsert extends Utils {
                         $CSVOrderedColumns, $subjectFilters, $key, $lineStart,$MySQLTables, $MySQLOrderedColumns);
                 $afilePaths = $this->selectEqualColumns($ColumnLine, $afilePaths, $key); 
                 $afilePaths[$key][6]=$ColumnLine[2];
+                if($afilePaths[$key][5] == "Equals"){
                 $this->getDataToInsert($ColumnLine, $dbh, $afilePaths[$key]);
+                } elseif ($afilePaths[$key][5] == "Different") {
+                    //get the $data with the colums to order from the file first.
+                    //$data = $this->getDataToOrderArry($data, $ColumnLine[0]);
+                }
             }
             $count++;
         }
         $this->filePaths = $afilePaths;
+    }
+    private function getDataToOrderArry($data, $Columns){
+        foreach ($data as $key => $value){
+            $poss[] = array_search($value, $realColumnsCSV);
+        }
+        //Order array and then insert. use $poss and $data.
+        $data = $this->orderArray($poss, $data);
+        return $data;
+    }
+
+    /**
+     * Order arrays when they are not equal
+     * **/
+    public function orderArray($poss, $data){
+//        var_dump($data);
+        $countPoss = count($poss);
+        $countData = count($data);
+        if ($countPoss === $countData){
+            $merged_array = array_combine($poss, $data);
+            // then sort array by keys and your words are in correct position
+            ksort($merged_array);
+
+            // update $array1 with sorted values 
+            $data = array_values($merged_array);
+
+        }else{
+            return FALSE;
+        }
+        return $data;
     }
     private function getDataToInsert($ColumnLine, $dbh, $filePath){
         if (($handle = fopen($filePath[0], "r")) !== FALSE) {
@@ -120,6 +154,7 @@ class CsvFileInsert extends Utils {
         $ColumnLine[3] = $MySQLOrderedColumns[$aux];
         return $ColumnLine;
     }
+    /* Old function that did everything */
     public function testCsvFile($doInsets,$filePaths, $CSVOrderedColumns, 
             $subjectFilters, $lineStart, $dbh, $MySQLOrderedColumns, $MySQLTables){        
         foreach ($doInsets as $key => $status){
@@ -184,7 +219,9 @@ class CsvFileInsert extends Utils {
         }
     }
 
-
+    /**
+     * Get the column types from the current MySQL table
+     *      */
     public function columnTypes($dbh,$MySQLOrderedColumns, $tableMySQL){
         $count = count($MySQLOrderedColumns);
         $aux = array();
@@ -194,6 +231,9 @@ class CsvFileInsert extends Utils {
         }        
         return $aux;
     }
+    /** 
+     * Convert a string to number
+     */
     public function stringToNumber($string){
         $string = str_replace(',', '', $string);
         $string = str_replace('"', '', $string);
@@ -219,6 +259,9 @@ class CsvFileInsert extends Utils {
         }
         return $string;
     }
+    /** 
+     *  Convert a string to a date
+     *     */
     public function stringToDatetime($string){
         $string = trim($string);
         $string = str_replace(' ', '', $string);
@@ -229,25 +272,12 @@ class CsvFileInsert extends Utils {
         $time = DateTime::createFromFormat('m/d/Y', $string)->format('Y-m-d h:i:s');
         return $time;
     }
+    /**
+
+     * Ends with is not used here now, reffer to MailDownload.php
+     *      */
     public function checkIsAValidDate($myDateString){
         return (bool)DateTime::createFromFormat('m/d/Y', $myDateString);
-    }
-    public function orderArray($poss, $data){
-//        var_dump($data);
-        $countPoss = count($poss);
-        $countData = count($data);
-        if ($countPoss === $countData){
-            $merged_array = array_combine($poss, $data);
-            // then sort array by keys and your words are in correct position
-            ksort($merged_array);
-
-            // update $array1 with sorted values 
-            $data = array_values($merged_array);
-
-        }else{
-            return FALSE;
-        }
-        return $data;
     }
     public function insertArrayIndex($array, $new_element, $index) {
          /*** get the start of the array ***/
