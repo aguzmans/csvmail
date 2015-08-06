@@ -27,7 +27,9 @@ class Utils {
                         . "AND date = :dateSent "
                         . "AND group_name = :groupName";
                 $senderMail = $filePath[2];
+                var_dump($filePath[3]);
                 $dateSent = new DateTime($filePath[3]);
+                var_dump($dateSent);
                 $group = $filePath[4];
                 $fileName = $filePath[0];
                 $filterPhrase = $filePath[1];

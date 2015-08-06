@@ -21,7 +21,7 @@ foreach ($attachmentPathNames as $key =>$attachmentPathName){
         if (strpos($attachmentPathName[1], $subjectFilter) > 0 || strpos($attachmentPathName[1], $subjectFilter) === 0){
             $attachmentPathNames[$key][1] = $subjectFilter;
             $files = new FileWorks();
-            echo 'File: '.$attachmentPathName[0].' Line Date: '.$lineStart[$key1][0].' Line Group: '.$lineStart[$key1][1].PHP_EOL;
+//            echo 'File: '.$attachmentPathName[0].' Line Date: '.$lineStart[$key1][0].' Line Group: '.$lineStart[$key1][1].PHP_EOL;
             $dateAndGroup = $files->getDateAndGroup($attachmentPathName[0], $key1, $lineStart);
         }
     }
@@ -34,7 +34,7 @@ foreach ($attachmentPathNames as $key =>$attachmentPathName){
         }
     }
 }
-
+//var_dump($attachmentPathNames);
 
 /* 2.1- Check that those files have not been received already*/
 /* 2.2- Save data to MySQL */
@@ -52,6 +52,6 @@ $CsvWorks->classifyFile($doInsets, $attachmentPathNames, $CSVOrderedColumns,
             $subjectFilters, $lineStart, $dbh ,$MySQLTables, $MySQLOrderedColumns);
 
 
-require_once './lib/FileCleaner.php';
-$files = new FileCleaner();
-$files->deleteDownloadedFiles($savedirpath);
+//require_once './lib/FileCleaner.php';
+//$files = new FileCleaner();
+//$files->deleteDownloadedFiles($savedirpath);

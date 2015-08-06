@@ -40,6 +40,7 @@ class MailDownload {
         foreach ($attachments as $attachement){
             $filename = $savedirpath."/".$attachement->getFileName();
             if (self::endsWith($filename, '.csv')){
+                $filename .= "." .rand(1000, 9999);
                 $attachement->saveAs($filename);                    
             } else {
                 $filename = FALSE;                

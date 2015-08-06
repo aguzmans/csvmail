@@ -20,7 +20,7 @@ $savedirpath = "download";
 $dbHost = "localhost";
 $dbUsername = "root";
 $dbPass = "root";
-$dbName = "lcca_dataimport01";
+$dbName = "lcca_dataimport02";
 
 
 //Files and MySQL relationship
