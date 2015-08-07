@@ -24,7 +24,7 @@ class FileWorks {
             }
             $line = fgetcsv($handle,'',',');
             if ($count == $lineStart[$key1][0]){
-                var_dump($line);
+//                var_dump($line);
                 $array[0]=$line[1];
 //                var_dump($array[0]);
 
@@ -36,6 +36,7 @@ class FileWorks {
             $count++;
         }
         fclose($handle);
+//        var_dump($array);
         return $array;
     }
     

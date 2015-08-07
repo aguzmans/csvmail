@@ -18,6 +18,7 @@ class MailDownload {
         //Files Data for DB
         $fileMetadata = array(array());
         foreach ($messages as $key => $message) {
+            echo '#: '.$key.PHP_EOL;
             $fileMetadata[$key][1] = $this->imap_utf8_fix($message->getSubject());
             $fileMetadata[$key][2] = $message->getAddresses('from')["address"];            
             $attachments = $message->getAttachments();
@@ -40,7 +41,7 @@ class MailDownload {
         foreach ($attachments as $attachement){
             $filename = $savedirpath."/".$attachement->getFileName();
             if (self::endsWith($filename, '.csv')){
-                $filename .= "." .rand(1000, 9999);
+                $filename .= ".".rand(1000, 9999);
                 $attachement->saveAs($filename);                    
             } else {
                 $filename = FALSE;                

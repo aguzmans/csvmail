@@ -25,10 +25,7 @@ class CsvFileInsert extends Utils {
                 if($afilePaths[$key][5] == "Equals"){
                     $this->getDataToInsert($ColumnLine, $dbh, $afilePaths[$key]);
                 } elseif ($afilePaths[$key][5] == "Different") {
-//                    echo "Different: not inserted";
-//                    var_dump($afilePaths[$key]);
-                    $this->getDataToInsert($ColumnLine, $dbh, $afilePaths[$key],'different');
-                   
+                    $this->getDataToInsert($ColumnLine, $dbh, $afilePaths[$key],'different');  
                 }
             }
             $count++;
@@ -96,7 +93,6 @@ class CsvFileInsert extends Utils {
  */
     private function insertToMySQL($data, $dbh, $OrderedColumns, $tableMySQL,$dateCreated){
         $data = $this->filterData($data,$dbh,$OrderedColumns, $tableMySQL);
-//        var_dump($data);
         if (count($data) > 5){
             $fielsNamesMySQL = implode("`, `", $OrderedColumns);
             $sql = "INSERT INTO `$tableMySQL` (id,`".$fielsNamesMySQL."`, `DateCreated`) VALUES (NULL,";
@@ -105,11 +101,9 @@ class CsvFileInsert extends Utils {
             }
             $dateCreatedTime=  new DateTime($dateCreated);
             $values[] = $dateCreatedTime->format('Y-m-d h:i:s');
-//            var_dump($values);
             try{
                 $qs=str_repeat("?,",count($values)-1);
                 $sql.="${qs}?);";
-//                echo PHP_EOL.$sql.PHP_EOL;
                 $q=$dbh->prepare($sql);
                 $q->execute($values);            
             } catch (PDOException $e){
@@ -251,67 +245,3 @@ class CsvFileInsert extends Utils {
          return array_merge($start, $end);
      }
 }
-    /* Old function that did everything */
-//    public function testCsvFile($doInsets,$filePaths, $CSVOrderedColumns, 
-//            $subjectFilters, $lineStart, $dbh, $MySQLOrderedColumns, $MySQLTables){        
-//        foreach ($doInsets as $key => $status){
-//            if ($status == "ToDo"){
-//                if (($handle = fopen($filePaths[$key][0], "r")) !== FALSE) {
-//                    $count=1;
-//                    $CommandInsert = FALSE;
-//                    $poss = array();
-//                    $order = FALSE;
-//                    while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {   
-////                        echo '-'.$count.PHP_EOL;
-//                        if ($data[count($data)-1] ==''){
-//                            array_pop($data);
-//                        }
-////                        var_dump($filePaths);
-//                        $realColumnsCSV = $CSVOrderedColumns[
-//                                        array_search($filePaths[$key][1], 
-//                                            $subjectFilters)];
-////                        echo $filePaths[$key][1].PHP_EOL;
-//                        $thisLine = $lineStart[array_search($filePaths[$key][1], 
-//                                            $subjectFilters)][2];
-//                        echo $thisLine."-".$count.PHP_EOL;
-//                        if ($count == $thisLine) {          
-//                            //var_dump($data,$realColumnsCSV);
-//                            if ($data === $realColumnsCSV) {
-//                                echo "Equals".PHP_EOL;
-//                                // Command insert to MySQL
-//                                $CommandInsert = TRUE;
-//                            } else {
-////                                var_dump($data, $realColumnsCSV);
-//                                echo 'The CSV columns are not in the right order the file or is corrupted.'
-//                                .PHP_EOL. 'Trying to fix...'.PHP_EOL;
-//                                
-//                                //var_dump($realColumnsCSV);
-//                                foreach ($data as $key => $value){
-//                                    $poss[] = array_search($value, $realColumnsCSV);
-//                                }
-//                                //Order array and then insert. use $poss and $data.
-//                                $data = $this->orderArray($poss, $data);
-//                                $order = TRUE;                                
-//                            }    
-//                        } elseif ($count > $thisLine && $CommandInsert === TRUE) {
-////                            var_dump($data);
-//                            //MySQL Insert
-//                            $this->insertToMySQL($data, $count, $dbh, 
-//                                $MySQLOrderedColumns[array_search($filePaths[$key][1], 
-//                                    $subjectFilters)], $MySQLTables[array_search($filePaths[$key][1], 
-//                                    $subjectFilters)]);
-//                        } elseif ($count > $thisLine && $order === TRUE) {
-//                            $data = $this->orderArray($poss, $data);
-//                            //MySQL Insert
-//                            $this->insertToMySQL($data, $count, $dbh, 
-//                                $MySQLOrderedColumns[array_search($filePaths[$key][1], 
-//                                    $subjectFilters)], $MySQLTables[array_search($filePaths[$key][1], 
-//                                    $subjectFilters)]);                            
-//                        }
-//                        $count +=1;                                
-//                    }   
-//                }             
-//            }
-//
-//        }
-//    }
