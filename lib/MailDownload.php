@@ -12,11 +12,7 @@ class MailDownload {
         $this->server = new \Fetch\Server($server, $port);
         $this->server->setAuthentication($user, $password);        
     }
-    /*Download attachment message by message*/
-    public function downloadAttachment($savedirpath){
-        $messages = $this->server->getMessages();
-        //Files Data for DB
-        $fileMetadata = array(array());
+    public function download1Mail($messages, $fileMetadata){
         foreach ($messages as $key => $message) {
             echo '#: '.$key.PHP_EOL;
             $fileMetadata[$key][1] = $this->imap_utf8_fix($message->getSubject());
@@ -30,6 +26,14 @@ class MailDownload {
                 $fileMetadata[$key][0] = $filename;
             }
         }
+        return $fileMetadata;        
+    }
+    /*Download attachment message by message*/
+    public function downloadAttachment($savedirpath){
+        $messages = $this->server->getMessages();
+        //Files Data for DB
+        $fileMetadata = array(array());
+        $fileMetadata = $this->download1Mail($messages, $fileMetadata);
         $fileMetadata = $this->removeSmallArrayMultidim($fileMetadata, 3);
         return $fileMetadata;
     }

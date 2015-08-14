@@ -60,6 +60,13 @@ class CsvFileInsert extends Utils {
         }
         return $data;
     }
+    private function getDifValues($poss, $data){
+        $keys = array_keys($data);
+        var_dump($keys);
+        $different = array_diff($poss, $keys);
+        return $different;
+    }
+
     private function getDataToInsert($ColumnLine, $dbh, $filePath, $different = ""){
         
         if (($handle = fopen($filePath[0], "r")) !== FALSE) {
@@ -76,11 +83,20 @@ class CsvFileInsert extends Utils {
                         foreach ($data as $key => $value){
                                 $poss[] = array_search($value, $ColumnLine[0]);
                         }
-//                        var_dump($poss);
+                        $diff = $this->getDifValues($poss, $data);
+                        var_dump($diff);
+                        if ($diff[0]>0){
+                            foreach ($poss as $key => $value1){
+                                if ($value1 == '' || $value1 == FALSE){
+                                    $poss[$key] = $key;
+                                    array_shift($diff);
+                                }
+                            }
+                            var_dump($value1);
+                        }
                     }
                     if($count > $ColumnLine[1]){
                         $data = $this->orderArray($poss, $data);
-//                        var_dump($data);
                         $this->insertToMySQL($data, $dbh, $ColumnLine[3], $filePath[6],$filePath[3]);
                     }
                 }
@@ -114,7 +130,7 @@ class CsvFileInsert extends Utils {
     public function filterData($data,$dbh,$MySQLOrderedColumns, $tableMySQL ){
         $types = $this->columnTypes($dbh, $MySQLOrderedColumns, $tableMySQL);
         array_shift($types);
-        if ($data[count($data)-1]== NULL){
+        if (is_array($data) && $data[count($data)-1]== NULL){
             array_pop($data);
         }
 //        var_dump($data,$types);

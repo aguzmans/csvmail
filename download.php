@@ -13,12 +13,14 @@ $utils = new Utils();
 $server = new MailDownload($mailServerShort,993,$email,$emailPassword);
 $attachmentPathNames = $server->downloadAttachment($savedirpath);
 //var_dump($attachmentPathNames);
-/*1.1take information header information from csv files.*/
+/*
+ * 1.1take information header information (Date,Group) from csv files.
+ */
 include_once './lib/FileWorks.php';
 foreach ($attachmentPathNames as $key =>$attachmentPathName){
     $dateAndGroup = array();
     foreach ($subjectFilters as $key1 => $subjectFilter){
-        echo 'Path: '.$attachmentPathName[1].' Subject: '.$subjectFilter.' Poss: '.strpos($attachmentPathName[1], $subjectFilter).PHP_EOL;
+//        echo 'Path: '.$attachmentPathName[1].' Subject: '.$subjectFilter.' Poss: '.strpos($attachmentPathName[1], $subjectFilter).PHP_EOL;
         if (strpos($attachmentPathName[1], $subjectFilter) > 0 || strpos($attachmentPathName[1], $subjectFilter) === 0){
             $attachmentPathNames[$key][1] = $subjectFilter;
             $files = new FileWorks();
@@ -35,15 +37,15 @@ foreach ($attachmentPathNames as $key =>$attachmentPathName){
         }
     }
 }
+/*
+ * Remove the files that have no date or do not have the right subject
+ * **/
 foreach ($attachmentPathNames as $key => $value ){
     if (count($value)<5){
         unset($attachmentPathNames[$key]);
     }
 }
 $attachmentPathNames = array_values($attachmentPathNames);
-
-//var_dump($attachmentPathNames);
-//var_dump($attachmentPathNames);
 
 /* 2.1- Check that those files have not been received already*/
 /* 2.2- Save data to MySQL */
